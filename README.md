@@ -1,5 +1,7 @@
 # Grounded
 
+**Live website:** https://loremafore.github.io/airlines-grounding-tracker/
+
 A static, configurable **U.S. airline scenario** inspired by the November 2026 airline communications disruption. The counter and per-carrier figures are *hypothetical*, not reported losses. [AIRLIVE's incident report](https://airlive.net/news/2026/11/13/global-microsoft-outage-disrupts-airline-communications-and-grounds-select-flights/) describes limited flight disruption at other carriers; it does **not** establish a U.S. fleet grounding or dollar losses. The roster contains 15 U.S. passenger/budget/cargo carriers and Spirit, not every U.S. airline. [Spirit announced its wind-down on May 2, 2026](https://www.prnewswire.com/news-releases/spirit-airlines-begins-orderly-wind-down-of-operations-302760586.html) and is shown at $0 rather than counted as a November outage loss.
 
 ## Run locally
