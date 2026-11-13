@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1320" />
+    <meta name="description" content="A transparent, configurable airline disruption cost scenario. Not reported financial losses." />
+    <title>Grounded — airline disruption cost scenario</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Grounded, back to top"><span class="brand-icon">✳</span> GROUNDED<span class="brand-dot">.</span></a>
+        <nav aria-label="Main navigation"><a href="#carriers">Airlines</a><a href="#methodology">Methodology</a><a class="nav-source" href="https://airlive.net/news/2026/11/13/global-microsoft-outage-disrupts-airline-communications-and-grounds-select-flights/" target="_blank" rel="noopener noreferrer">Incident report ↗</a></nav>
+      </header>
+
+      <main id="top">
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="hero-main">
+            <div class="eyebrow"><span class="pulse" aria-hidden="true"></span> SCENARIO COUNTER <span class="eyebrow-separator">/</span> NOV 2026 SERVICE DISRUPTION</div>
+            <h1 id="hero-title">When flights pause,<br /><em>the clock doesn’t.</em></h1>
+            <p class="hero-copy">An illustrative view of airline disruption costs during the November 2026 Microsoft-service outage. The numbers are <strong>model outputs, not verified airline losses</strong>.</p>
+            <a class="text-link" href="#methodology">How this estimate works <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="hero-art" aria-hidden="true"><div class="orbit orbit-outer"></div><div class="orbit orbit-mid"></div><div class="orbit orbit-inner"></div><div class="crosshair crosshair-one">+</div><div class="crosshair crosshair-two">+</div><div class="plane">✈</div><div class="art-coordinate">N 40°42′ / W 74°00′</div><div class="art-label">AIRSPACE / 001</div></div>
+        </section>
+
+        <section class="counter-panel" aria-label="Modeled total">
+          <div class="counter-top"><span><span class="live-dot"></span> MODELED TOTAL EXPOSURE</span><span id="clock">— UTC</span></div>
+          <div id="total" class="total-number" aria-live="off">$0</div>
+          <div class="counter-bottom"><p>Illustrative cumulative cost across <strong id="carrier-count">4</strong> scenario airlines</p><span id="rate-total">$0 / hour modeled</span></div>
+          <div class="counter-stripe" aria-hidden="true"></div>
+        </section>
+
+        <section id="carriers" class="carriers-section" aria-labelledby="carriers-title">
+          <div class="section-heading"><div><div class="section-kicker">01 / THE BREAKDOWN</div><h2 id="carriers-title">Airline by airline<span class="accent">.</span></h2><p>Illustrative inputs, not airline-reported figures. A larger rate means a larger modeled share.</p></div><span class="section-index">01 — 04</span></div>
+          <div class="list-head" aria-hidden="true"><span>CARRIER / SERVICE</span><span>MODELED EXPOSURE</span></div>
+          <div id="carrier-list" class="carrier-list"></div>
+          <p class="list-footnote">These are hypothetical per-hour assumptions. IndiGo and Air India reported flights operating normally; their entries represent only a modeled customer-service scenario, not grounded flights.</p>
+        </section>
+
+        <section id="methodology" class="method-section" aria-labelledby="method-title">
+          <div class="section-kicker">02 / THE FINE PRINT</div><h2 id="method-title">Know what you’re<br /><em>looking at.</em></h2>
+          <div class="method-grid"><div class="method-card"><span class="method-number">01</span><h3>Not a live financial feed</h3><p>No airline has supplied these loss figures. Each number is a hypothetical hourly cost multiplied by elapsed time. The total is the sum of the listed airlines.</p></div><div class="method-card"><span class="method-number">02</span><h3>Time, not refreshes</h3><p>Refreshing recalculates from the same UTC start time. It never adds a random amount per visit. The counter updates every second and stops at the configured end time.</p></div><div class="method-card"><span class="method-number">03</span><h3>Limited confirmed impact</h3><p><a href="https://airlive.net/news/2026/11/13/global-microsoft-outage-disrupts-airline-communications-and-grounds-select-flights/" target="_blank" rel="noopener noreferrer">AIRLIVE’s Nov 13 report ↗</a> describes three SpiceJet cancellations and two delays, plus communications issues at other carriers. It does not establish a global fleet grounding or any financial loss total.</p></div></div>
+          <details class="settings"><summary>Adjust scenario assumptions <span aria-hidden="true">↗</span></summary><div class="settings-content"><p>Changes are saved in this browser only. Enter an end time to stop the estimate when the incident is over; leaving it blank keeps the scenario running.</p><div class="settings-dates"><label>Scenario start (UTC)<input id="start-time" type="datetime-local" /></label><label>Scenario end (UTC, optional)<input id="end-time" type="datetime-local" /></label></div><div id="rate-settings" class="rate-settings"></div><div class="settings-actions"><button id="save-settings" type="button">Apply assumptions</button><button id="reset-settings" type="button" class="button-secondary">Reset example</button><span id="settings-message" role="status"></span></div></div></details>
+        </section>
+      </main>
+      <footer><span class="footer-brand">GROUNDED<span class="brand-dot">.</span></span><p>Built for transparency. Not investment, travel, or financial advice.</p><a href="#top">BACK TO TOP ↑</a></footer>
+    </div>
+  </body>
+</html>
