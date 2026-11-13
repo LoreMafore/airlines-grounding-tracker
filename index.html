@@ -6,8 +6,8 @@
     <meta name="theme-color" content="#0b1320" />
     <meta name="description" content="A transparent, configurable airline disruption cost scenario. Not reported financial losses." />
     <title>Grounded — airline disruption cost scenario</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="app.js" defer></script>
+    <link rel="stylesheet" href="styles.css?v=3" />
+    <script src="app.js?v=3" defer></script>
   </head>
   <body>
     <div class="site-shell">
@@ -22,6 +22,7 @@
             <div class="eyebrow"><span class="pulse" aria-hidden="true"></span> U.S. AIRLINE SCENARIO <span class="eyebrow-separator">/</span> NOV 2026</div>
             <h1 id="hero-title">When flights pause,<br /><em>the clock doesn’t.</em></h1>
             <p class="hero-copy">What would a prolonged disruption cost U.S. airlines? This is a <strong>hypothetical scenario, not verified losses or evidence these carriers were grounded</strong>.</p>
+            <p class="eyebrow">AMERICAN AIRLINES · DELTA · UNITED · SPIRIT · MORE BELOW ↓</p>
             <a class="text-link" href="#methodology">How this estimate works <span aria-hidden="true">↗</span></a>
           </div>
           <div class="hero-art" aria-hidden="true"><div class="orbit orbit-outer"></div><div class="orbit orbit-mid"></div><div class="orbit orbit-inner"></div><div class="crosshair crosshair-one">+</div><div class="crosshair crosshair-two">+</div><div class="plane">✈</div><div class="art-coordinate">N 40°42′ / W 74°00′</div><div class="art-label">AIRSPACE / 001</div></div>
@@ -35,9 +36,26 @@
         </section>
 
         <section id="carriers" class="carriers-section" aria-labelledby="carriers-title">
-          <div class="section-heading"><div><div class="section-kicker">01 / THE BREAKDOWN</div><h2 id="carriers-title">Airline by airline<span class="accent">.</span></h2><p>Major U.S. passenger, budget, and cargo carriers. Illustrative inputs, not airline-reported figures.</p></div><span id="list-range" class="section-index">01 — 16</span></div>
+          <div class="section-heading"><div><div class="section-kicker">01 / THE BREAKDOWN</div><h2 id="carriers-title">U.S. airlines<span class="accent">.</span></h2><p>Major U.S. passenger, budget, and cargo carriers. Illustrative inputs, not airline-reported figures.</p></div><span id="list-range" class="section-index">01 — 16</span></div>
           <div class="list-head" aria-hidden="true"><span>CARRIER / SERVICE</span><span>MODELED EXPOSURE</span></div>
-          <div id="carrier-list" class="carrier-list"></div>
+          <div id="carrier-list" class="carrier-list">
+            <article class="carrier-row"><span class="carrier-number">01</span><h3 class="carrier-name">American Airlines</h3></article>
+            <article class="carrier-row"><span class="carrier-number">02</span><h3 class="carrier-name">Delta Air Lines</h3></article>
+            <article class="carrier-row"><span class="carrier-number">03</span><h3 class="carrier-name">United Airlines</h3></article>
+            <article class="carrier-row"><span class="carrier-number">04</span><h3 class="carrier-name">Southwest Airlines</h3></article>
+            <article class="carrier-row"><span class="carrier-number">05</span><h3 class="carrier-name">Alaska Airlines</h3></article>
+            <article class="carrier-row"><span class="carrier-number">06</span><h3 class="carrier-name">JetBlue Airways</h3></article>
+            <article class="carrier-row"><span class="carrier-number">07</span><h3 class="carrier-name">Hawaiian Airlines</h3></article>
+            <article class="carrier-row"><span class="carrier-number">08</span><h3 class="carrier-name">Frontier Airlines</h3></article>
+            <article class="carrier-row"><span class="carrier-number">09</span><h3 class="carrier-name">Allegiant Air</h3></article>
+            <article class="carrier-row"><span class="carrier-number">10</span><h3 class="carrier-name">Sun Country Airlines</h3></article>
+            <article class="carrier-row"><span class="carrier-number">11</span><h3 class="carrier-name">Breeze Airways</h3></article>
+            <article class="carrier-row"><span class="carrier-number">12</span><h3 class="carrier-name">Avelo Airlines</h3></article>
+            <article class="carrier-row"><span class="carrier-number">13</span><h3 class="carrier-name">FedEx Express</h3></article>
+            <article class="carrier-row"><span class="carrier-number">14</span><h3 class="carrier-name">UPS Airlines</h3></article>
+            <article class="carrier-row"><span class="carrier-number">15</span><h3 class="carrier-name">Atlas Air</h3></article>
+            <article class="carrier-row"><span class="carrier-number">16</span><h3 class="carrier-name">Spirit Airlines · inactive, $0</h3></article>
+          </div>
           <p class="list-footnote">This is a selected roster, not every U.S.-certificated airline. No U.S. carrier in this list is confirmed grounded by the cited incident. <a href="https://www.prnewswire.com/news-releases/spirit-airlines-begins-orderly-wind-down-of-operations-302760586.html" target="_blank" rel="noopener noreferrer">Spirit ceased operations on May 2, 2026 ↗</a>, so its November scenario rate is fixed at $0. Rates are arbitrary examples, not measured financial impacts.</p>
         </section>
 
