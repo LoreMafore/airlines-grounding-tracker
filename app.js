@@ -15,15 +15,15 @@ const defaults = {
     { name: 'Sun Country Airlines', detail: 'FY2024 group revenue proxy', annual: 1.076e9, source: 'https://www.barchart.com/story/news/30752246/sun-country-airlines-reports-fourth-quarter-and-full-year-2024-results' },
     { name: 'Breeze Airways', detail: 'Illustrative input · no comparable cited revenue', rate: 1000 },
     { name: 'Avelo Airlines', detail: 'Illustrative input · no comparable cited revenue', rate: 800 },
-    { name: 'FedEx Express', detail: 'Illustrative input · parent revenue includes non-air operations', rate: 4000 },
-    { name: 'UPS Airlines', detail: 'Illustrative input · parent revenue includes non-air operations', rate: 3500 },
+    { name: 'FedEx Express', detail: 'FY2024 Express segment · includes international & ground legs', annual: 40.857e9, source: 'https://www.sec.gov/Archives/edgar/data/1048911/000095017024077290/fdx-ex99_1.htm' },
+    { name: 'UPS Airlines', detail: 'FY2024 U.S. Next Day Air product only · partial proxy', annual: 9.703e9, source: 'https://investors.ups.com/sec-filings/annual-filings/xbrl_doc_only/4564' },
     { name: 'Atlas Air', detail: 'Illustrative input · no comparable cited revenue', rate: 1500 },
     { name: 'Spirit Airlines', detail: 'Ceased operations May 2026 · excluded', rate: 0, inactive: true }
   ]
 };
 
 defaults.airlines.forEach(airline => { if (airline.annual) airline.rate = airline.annual / 365 / 24; });
-const storageKey = 'grounded-scenario-v3';
+const storageKey = 'grounded-scenario-v4';
 const dollars = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 const $ = id => document.getElementById(id);
 
@@ -48,8 +48,15 @@ function exposure(rate, now) {
 
 function render() {
   const now = Date.now();
+  const start = Date.parse(scenario.start);
+  const until = scenario.end ? Math.min(now, Date.parse(scenario.end)) : now;
+  const seconds = Math.floor(Math.max(0, until - start) / 1000);
   const sum = scenario.airlines.reduce((total, airline) => total + exposure(airline.rate, now), 0);
   $('total').textContent = dollars.format(sum);
+  const utcStart = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(start);
+  const easternStart = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(start);
+  $('start-display').textContent = `${utcStart} UTC / ${easternStart}`;
+  $('elapsed-display').textContent = `${Math.floor(seconds / 3600)}h ${String(Math.floor(seconds % 3600 / 60)).padStart(2, '0')}m ${String(seconds % 60).padStart(2, '0')}s`;
   $('rate-total').textContent = `${dollars.format(scenario.airlines.reduce((total, airline) => total + airline.rate, 0))} / hour modeled`;
   $('carrier-count').textContent = scenario.airlines.length;
   $('list-range').textContent = `01 — ${String(scenario.airlines.length).padStart(2, '0')}`;
