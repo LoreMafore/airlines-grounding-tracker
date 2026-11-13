@@ -2,7 +2,7 @@
 
 **Live website:** https://loremafore.github.io/airlines-grounding-tracker/
 
-A static, configurable **U.S. airline scenario** inspired by the November 2026 airline communications disruption. The counter and per-carrier figures are *hypothetical*, not reported losses. [AIRLIVE's incident report](https://airlive.net/news/2026/11/13/global-microsoft-outage-disrupts-airline-communications-and-grounds-select-flights/) describes limited flight disruption at other carriers; it does **not** establish a U.S. fleet grounding or dollar losses. The roster contains 15 U.S. passenger/budget/cargo carriers and Spirit, not every U.S. airline. [Spirit announced its wind-down on May 2, 2026](https://www.prnewswire.com/news-releases/spirit-airlines-begins-orderly-wind-down-of-operations-302760586.html) and is shown at $0 rather than counted as a November outage loss.
+A static, configurable **revenue-exposure scenario** for the [nationwide FAA ground stop on Nov 13, 2026](https://www.cnbc.com/2026/11/13/faa-ground-stop.html). The figures are *not verified airline losses*. The roster lists selected U.S. carriers, not every certificated airline. [Spirit ceased operations on May 2, 2026](https://www.prnewswire.com/news-releases/spirit-airlines-begins-orderly-wind-down-of-operations-302760586.html) and is excluded. Hawaiian is listed separately, but excluded because its revenue is already partly included in Alaska Air Group's group figure.
 
 ## Run locally
 
@@ -15,7 +15,13 @@ Open http://localhost:8000. `nix build` produces the deployable static files in 
 
 ## Calculation
 
-Each carrier's amount = hypothetical USD/hour × max(0, min(current UTC time, optional end time) − scenario start UTC), measured in hours. The aggregate is the sum of the rows. The page recalculates each second and on refresh, with no random increment. Example start: **2026-11-12 16:00 UTC** (a modeling assumption, not a confirmed incident start). The default end is unset, so **set an end time when the incident resolves** to avoid implying continued losses. Adjust rates and timestamps in “Adjust scenario assumptions”; browser-local changes do not affect other visitors. To change the published defaults, edit `defaults` in `app.js` and redeploy.
+For nine publicly reporting carrier groups, the starting hourly rate = linked **FY2024 operating revenue / 365 / 24** (the links appear next to each carrier). Breeze, Avelo, FedEx Express, UPS Airlines, and Atlas Air still use **clearly marked, unsourced illustrative inputs**, because comparable stand-alone airline revenue figures are not included in this version. Alaska Air Group's figure includes Hawaiian only from September 2024, not the whole year. The page sums the carriers' hourly rates and multiplies by hours since **2026-11-13 20:53 UTC** (the reported ground-stop advisory window start), stopping at an optional end time. It recalculates each second and on refresh; it never adds an arbitrary amount per visit.
+
+**These numbers are revenue-rate proxies, not lost revenue or profit.** Airline group revenue includes non-U.S., non-flight and unaffected activity; delays can be recovered. This method assumes every hour is identical and does not apply any measured disruption share. Set an end time when the stop lifts; no automatic FAA-status feed is connected. Adjust rates/timestamps locally in “Adjust scenario assumptions”; local changes only affect your browser. To change published defaults, edit `app.js` and redeploy.
+
+### Why another website reports a much higher total
+
+[Grounded Losses](https://tobincavanaugh.github.io/airlinelosses/) uses a similar 2024-revenue approach for its airline subtotal but also adds **$500m/day** assumed tourism spending, **$300m/day** assumed passenger productivity, **$150m/day** assumed cargo/supply chain effects, and estimated regional revenue (which may overlap group totals). That's **$950m/day, or about $10,995/second**, in non-airline categories before regional revenue. It starts at **21:06 UTC**, 13 minutes later than our reported advisory-window start. Our previous version used arbitrary small hourly rates and began on Nov 12, so the two sites were calculating different things. Neither website can determine actual airline losses from these inputs.
 
 ## Publish on GitHub Pages
 

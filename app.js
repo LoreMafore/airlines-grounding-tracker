@@ -1,28 +1,29 @@
-// Example inputs only: none of these hourly amounts are published airline losses.
+// Revenue exposure proxies, not measured losses. FY2024 figures are linked per carrier.
 const defaults = {
-  start: '2026-11-12T16:00:00Z',
+  start: '2026-11-13T20:53:00Z',
   end: null,
   airlines: [
-    { name: 'American Airlines', detail: 'U.S. passenger carrier · hypothetical', rate: 8000 },
-    { name: 'Delta Air Lines', detail: 'U.S. passenger carrier · hypothetical', rate: 8000 },
-    { name: 'United Airlines', detail: 'U.S. passenger carrier · hypothetical', rate: 8000 },
-    { name: 'Southwest Airlines', detail: 'U.S. passenger carrier · hypothetical', rate: 6000 },
-    { name: 'Alaska Airlines', detail: 'U.S. passenger carrier · hypothetical', rate: 4000 },
-    { name: 'JetBlue Airways', detail: 'U.S. passenger carrier · hypothetical', rate: 3500 },
-    { name: 'Hawaiian Airlines', detail: 'U.S. passenger brand · hypothetical', rate: 2500 },
-    { name: 'Frontier Airlines', detail: 'U.S. budget carrier · hypothetical', rate: 2500 },
-    { name: 'Allegiant Air', detail: 'U.S. budget carrier · hypothetical', rate: 2000 },
-    { name: 'Sun Country Airlines', detail: 'U.S. budget carrier · hypothetical', rate: 1200 },
-    { name: 'Breeze Airways', detail: 'U.S. budget carrier · hypothetical', rate: 1000 },
-    { name: 'Avelo Airlines', detail: 'U.S. budget carrier · hypothetical', rate: 800 },
-    { name: 'FedEx Express', detail: 'U.S. cargo carrier · hypothetical', rate: 4000 },
-    { name: 'UPS Airlines', detail: 'U.S. cargo carrier · hypothetical', rate: 3500 },
-    { name: 'Atlas Air', detail: 'U.S. cargo carrier · hypothetical', rate: 1500 },
-    { name: 'Spirit Airlines', detail: 'Ceased operations May 2026 · not in scenario', rate: 0, inactive: true }
+    { name: 'American Airlines', detail: 'FY2024 group revenue proxy', annual: 54.2e9, source: 'https://news.aa.com/news/news-details/2025/American-Airlines-reports-fourth-quarter-and-full-year-2024-financial-results-CORP-FI-01/default.aspx' },
+    { name: 'Delta Air Lines', detail: 'FY2024 group revenue proxy', annual: 61.643e9, source: 'https://ir.delta.com/news/news-details/2025/Delta-Air-Lines-Announces-December-Quarter-and-Full-Year-2024-Financial-Results' },
+    { name: 'United Airlines', detail: 'FY2024 group revenue proxy', annual: 57.063e9, source: 'https://united.mediaroom.com/2025-01-21-United-Airlines-Achieves-Record-Fourth-Quarter-Profit-Well-Ahead-Of-Expectations-Reiterates-Path-To-Double-Digit-Pre-Tax-Margin' },
+    { name: 'Southwest Airlines', detail: 'FY2024 group revenue proxy', annual: 27.5e9, source: 'https://www.sec.gov/Archives/edgar/data/92380/000009238025000007/er-12312024xerdoc.htm' },
+    { name: 'Alaska Airlines', detail: 'FY2024 Alaska Air Group · includes Hawaiian since Sept', annual: 11.7e9, source: 'https://news.alaskaair.com/company/alaska-air-group-fourth-quarter-and-full-year-2024-results/' },
+    { name: 'JetBlue Airways', detail: 'FY2024 group revenue proxy', annual: 9.28e9, source: 'https://s202.q4cdn.com/853609783/files/doc_financials/2025/ar/2024-Annual-Report.pdf' },
+    { name: 'Hawaiian Airlines', detail: 'Included in Alaska Air Group · no double count', rate: 0, inactive: true },
+    { name: 'Frontier Airlines', detail: 'FY2024 group revenue proxy', annual: 3.775e9, source: 'https://ir.flyfrontier.com/node/9291/pdf' },
+    { name: 'Allegiant Air', detail: 'FY2024 group revenue proxy', annual: 2.513e9, source: 'https://ir.allegiantair.com/news/news-details/2025/ALLEGIANT-TRAVEL-COMPANY-FOURTH-QUARTER-AND-FULL-YEAR-2024-FINANCIAL-RESULTS/default.aspx' },
+    { name: 'Sun Country Airlines', detail: 'FY2024 group revenue proxy', annual: 1.076e9, source: 'https://www.barchart.com/story/news/30752246/sun-country-airlines-reports-fourth-quarter-and-full-year-2024-results' },
+    { name: 'Breeze Airways', detail: 'Illustrative input · no comparable cited revenue', rate: 1000 },
+    { name: 'Avelo Airlines', detail: 'Illustrative input · no comparable cited revenue', rate: 800 },
+    { name: 'FedEx Express', detail: 'Illustrative input · parent revenue includes non-air operations', rate: 4000 },
+    { name: 'UPS Airlines', detail: 'Illustrative input · parent revenue includes non-air operations', rate: 3500 },
+    { name: 'Atlas Air', detail: 'Illustrative input · no comparable cited revenue', rate: 1500 },
+    { name: 'Spirit Airlines', detail: 'Ceased operations May 2026 · excluded', rate: 0, inactive: true }
   ]
 };
 
-const storageKey = 'grounded-scenario-v2';
+defaults.airlines.forEach(airline => { if (airline.annual) airline.rate = airline.annual / 365 / 24; });
+const storageKey = 'grounded-scenario-v3';
 const dollars = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 const $ = id => document.getElementById(id);
 
@@ -71,6 +72,12 @@ function buildRows() {
     const name = document.createElement('h3'); name.className = 'carrier-name'; name.textContent = airline.name;
     const detail = document.createElement('span'); detail.className = 'carrier-meta'; detail.textContent = airline.detail;
     info.append(name, detail);
+    if (airline.source) {
+      const source = document.createElement('a');
+      source.className = 'carrier-source'; source.href = airline.source;
+      source.target = '_blank'; source.rel = 'noopener noreferrer'; source.textContent = 'FY2024 source ↗';
+      info.append(source);
+    }
     const bar = document.createElement('div'); bar.className = 'carrier-bar'; bar.setAttribute('aria-hidden', 'true');
     const fill = document.createElement('span'); fill.id = `bar-${index}`; bar.append(fill);
     const amount = document.createElement('div'); amount.className = 'carrier-amount';
@@ -89,7 +96,7 @@ function populateSettings() {
   $('rate-settings').replaceChildren();
   scenario.airlines.forEach((airline, index) => {
     const label = document.createElement('label');
-    label.textContent = `${airline.name} · hypothetical USD / hour`;
+    label.textContent = `${airline.name} · ${airline.source ? 'FY2024 revenue / 8,760' : 'illustrative'} USD / hour`;
     const input = document.createElement('input');
     input.id = `rate-${index}`; input.type = 'number'; input.min = '0'; input.max = '1000000000'; input.step = '1'; input.required = true; input.value = airline.rate; input.disabled = Boolean(airline.inactive);
     label.append(input); $('rate-settings').append(label);
