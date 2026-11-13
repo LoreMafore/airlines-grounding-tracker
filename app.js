@@ -3,14 +3,26 @@ const defaults = {
   start: '2026-11-12T16:00:00Z',
   end: null,
   airlines: [
-    { name: 'SpiceJet', detail: 'Flight disruption reported', rate: 2500 },
-    { name: 'IndiGo', detail: 'Email support impacted · flights unaffected', rate: 900 },
-    { name: 'Air India', detail: 'Email rerouted · flights unaffected', rate: 600 },
-    { name: 'Akasa Air', detail: 'Email support delays reported', rate: 300 }
+    { name: 'American Airlines', detail: 'U.S. passenger carrier · hypothetical', rate: 8000 },
+    { name: 'Delta Air Lines', detail: 'U.S. passenger carrier · hypothetical', rate: 8000 },
+    { name: 'United Airlines', detail: 'U.S. passenger carrier · hypothetical', rate: 8000 },
+    { name: 'Southwest Airlines', detail: 'U.S. passenger carrier · hypothetical', rate: 6000 },
+    { name: 'Alaska Airlines', detail: 'U.S. passenger carrier · hypothetical', rate: 4000 },
+    { name: 'JetBlue Airways', detail: 'U.S. passenger carrier · hypothetical', rate: 3500 },
+    { name: 'Hawaiian Airlines', detail: 'U.S. passenger brand · hypothetical', rate: 2500 },
+    { name: 'Frontier Airlines', detail: 'U.S. budget carrier · hypothetical', rate: 2500 },
+    { name: 'Allegiant Air', detail: 'U.S. budget carrier · hypothetical', rate: 2000 },
+    { name: 'Sun Country Airlines', detail: 'U.S. budget carrier · hypothetical', rate: 1200 },
+    { name: 'Breeze Airways', detail: 'U.S. budget carrier · hypothetical', rate: 1000 },
+    { name: 'Avelo Airlines', detail: 'U.S. budget carrier · hypothetical', rate: 800 },
+    { name: 'FedEx Express', detail: 'U.S. cargo carrier · hypothetical', rate: 4000 },
+    { name: 'UPS Airlines', detail: 'U.S. cargo carrier · hypothetical', rate: 3500 },
+    { name: 'Atlas Air', detail: 'U.S. cargo carrier · hypothetical', rate: 1500 },
+    { name: 'Spirit Airlines', detail: 'Ceased operations May 2026 · not in scenario', rate: 0, inactive: true }
   ]
 };
 
-const storageKey = 'grounded-scenario-v1';
+const storageKey = 'grounded-scenario-v2';
 const dollars = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 const $ = id => document.getElementById(id);
 
@@ -20,7 +32,7 @@ function loadScenario() {
     if (saved && Number.isFinite(Date.parse(saved.start)) &&
         (saved.end === null || Number.isFinite(Date.parse(saved.end))) &&
         Array.isArray(saved.rates) && saved.rates.length === defaults.airlines.length &&
-        saved.rates.every(rate => Number.isFinite(rate) && rate >= 0 && rate <= 1000000000)) {
+        saved.rates.every((rate, index) => Number.isFinite(rate) && rate >= 0 && rate <= 1000000000 && (!defaults.airlines[index].inactive || rate === 0))) {
       return { start: saved.start, end: saved.end, airlines: defaults.airlines.map((airline, index) => ({ ...airline, rate: saved.rates[index] })) };
     }
   } catch (_) { /* Ignore invalid or disabled local storage. */ }
@@ -39,6 +51,7 @@ function render() {
   $('total').textContent = dollars.format(sum);
   $('rate-total').textContent = `${dollars.format(scenario.airlines.reduce((total, airline) => total + airline.rate, 0))} / hour modeled`;
   $('carrier-count').textContent = scenario.airlines.length;
+  $('list-range').textContent = `01 — ${String(scenario.airlines.length).padStart(2, '0')}`;
   $('clock').textContent = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).format(now) + ' UTC';
   scenario.airlines.forEach((airline, index) => {
     $(`value-${index}`).textContent = dollars.format(exposure(airline.rate, now));
@@ -78,7 +91,7 @@ function populateSettings() {
     const label = document.createElement('label');
     label.textContent = `${airline.name} · hypothetical USD / hour`;
     const input = document.createElement('input');
-    input.id = `rate-${index}`; input.type = 'number'; input.min = '0'; input.max = '1000000000'; input.step = '1'; input.required = true; input.value = airline.rate;
+    input.id = `rate-${index}`; input.type = 'number'; input.min = '0'; input.max = '1000000000'; input.step = '1'; input.required = true; input.value = airline.rate; input.disabled = Boolean(airline.inactive);
     label.append(input); $('rate-settings').append(label);
   });
 }
