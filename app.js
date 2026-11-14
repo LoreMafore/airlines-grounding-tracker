@@ -1,7 +1,8 @@
 // Revenue exposure proxies, not measured losses. FY2024 figures are linked per carrier.
 const defaults = {
   start: '2026-11-13T20:53:00Z',
-  end: null,
+  // FAA cancellation advisory 005, signed 01:19 UTC on November 14.
+  end: '2026-11-14T01:19:00Z',
   airlines: [
     { name: 'American Airlines', detail: 'FY2024 group revenue proxy', annual: 54.2e9, source: 'https://news.aa.com/news/news-details/2025/American-Airlines-reports-fourth-quarter-and-full-year-2024-financial-results-CORP-FI-01/default.aspx' },
     { name: 'Delta Air Lines', detail: 'FY2024 group revenue proxy', annual: 61.643e9, source: 'https://ir.delta.com/news/news-details/2025/Delta-Air-Lines-Announces-December-Quarter-and-Full-Year-2024-Financial-Results' },
@@ -23,35 +24,31 @@ const defaults = {
 };
 
 defaults.airlines.forEach(airline => { if (airline.annual) airline.rate = airline.annual / 365 / 24; });
-const storageKey = 'grounded-scenario-v4';
+const storageKey = 'grounded-scenario-v5';
 const dollars = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 const $ = id => document.getElementById(id);
 
 function loadScenario() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey));
-    if (saved && Number.isFinite(Date.parse(saved.start)) &&
-        (saved.end === null || Number.isFinite(Date.parse(saved.end))) &&
+    if (saved && Number.isFinite(Date.parse(saved.start)) && Date.parse(saved.start) <= Date.parse(defaults.end) &&
         Array.isArray(saved.rates) && saved.rates.length === defaults.airlines.length &&
         saved.rates.every((rate, index) => Number.isFinite(rate) && rate >= 0 && rate <= 1000000000 && (!defaults.airlines[index].inactive || rate === 0))) {
-      return { start: saved.start, end: saved.end, airlines: defaults.airlines.map((airline, index) => ({ ...airline, rate: saved.rates[index] })) };
+      return { start: saved.start, end: defaults.end, airlines: defaults.airlines.map((airline, index) => ({ ...airline, rate: saved.rates[index] })) };
     }
   } catch (_) { /* Ignore invalid or disabled local storage. */ }
   return structuredClone(defaults);
 }
 
 let scenario = loadScenario();
-function exposure(rate, now) {
-  const until = scenario.end ? Math.min(now, Date.parse(scenario.end)) : now;
-  return rate * Math.max(0, until - Date.parse(scenario.start)) / 3600000;
+function exposure(rate) {
+  return rate * Math.max(0, Date.parse(scenario.end) - Date.parse(scenario.start)) / 3600000;
 }
 
 function render() {
-  const now = Date.now();
   const start = Date.parse(scenario.start);
-  const until = scenario.end ? Math.min(now, Date.parse(scenario.end)) : now;
-  const seconds = Math.floor(Math.max(0, until - start) / 1000);
-  const sum = scenario.airlines.reduce((total, airline) => total + exposure(airline.rate, now), 0);
+  const seconds = Math.floor(Math.max(0, Date.parse(scenario.end) - start) / 1000);
+  const sum = scenario.airlines.reduce((total, airline) => total + exposure(airline.rate), 0);
   $('total').textContent = dollars.format(sum);
   const utcStart = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(start);
   const easternStart = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(start);
@@ -60,9 +57,9 @@ function render() {
   $('rate-total').textContent = `${dollars.format(scenario.airlines.reduce((total, airline) => total + airline.rate, 0))} / hour modeled`;
   $('carrier-count').textContent = scenario.airlines.length;
   $('list-range').textContent = `01 — ${String(scenario.airlines.length).padStart(2, '0')}`;
-  $('clock').textContent = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).format(now) + ' UTC';
+  $('clock').textContent = 'STOP ENDED · FINAL ESTIMATE';
   scenario.airlines.forEach((airline, index) => {
-    $(`value-${index}`).textContent = dollars.format(exposure(airline.rate, now));
+    $(`value-${index}`).textContent = dollars.format(exposure(airline.rate));
     $(`hourly-${index}`).textContent = `${dollars.format(airline.rate)} / hour`;
     const maxRate = Math.max(...scenario.airlines.map(item => item.rate));
     $(`bar-${index}`).style.width = `${maxRate ? airline.rate / maxRate * 100 : 0}%`;
@@ -99,7 +96,6 @@ function buildRows() {
 function localInputValue(date) { return date ? new Date(date).toISOString().slice(0, 16) : ''; }
 function populateSettings() {
   $('start-time').value = localInputValue(scenario.start);
-  $('end-time').value = localInputValue(scenario.end);
   $('rate-settings').replaceChildren();
   scenario.airlines.forEach((airline, index) => {
     const label = document.createElement('label');
@@ -112,14 +108,13 @@ function populateSettings() {
 
 $('save-settings').addEventListener('click', () => {
   const start = $('start-time').value;
-  const end = $('end-time').value;
   const rates = scenario.airlines.map((_, index) => Number($(`rate-${index}`).value));
-  if (!start || (end && end < start) || rates.some((rate, index) => !Number.isFinite(rate) || rate < 0 || rate > 1000000000 || $(`rate-${index}`).value === '')) {
-    $('settings-message').textContent = 'Enter valid UTC dates and non-negative hourly rates.';
+  if (!start || start > localInputValue(defaults.end) || rates.some((rate, index) => !Number.isFinite(rate) || rate < 0 || rate > 1000000000 || $(`rate-${index}`).value === '')) {
+    $('settings-message').textContent = 'Enter a start before the FAA cancellation and valid non-negative rates.';
     return;
   }
-  scenario = { start: `${start}:00Z`, end: end ? `${end}:00Z` : null, airlines: defaults.airlines.map((airline, index) => ({ ...airline, rate: rates[index] })) };
-  try { localStorage.setItem(storageKey, JSON.stringify({ start: scenario.start, end: scenario.end, rates })); } catch (_) { /* Browser storage may be unavailable. */ }
+  scenario = { start: `${start}:00Z`, end: defaults.end, airlines: defaults.airlines.map((airline, index) => ({ ...airline, rate: rates[index] })) };
+  try { localStorage.setItem(storageKey, JSON.stringify({ start: scenario.start, rates })); } catch (_) { /* Browser storage may be unavailable. */ }
   $('settings-message').textContent = 'Scenario updated in this browser.';
   render();
 });
@@ -130,4 +125,4 @@ $('reset-settings').addEventListener('click', () => {
   $('settings-message').textContent = 'Example assumptions restored.';
 });
 
-buildRows(); populateSettings(); render(); setInterval(render, 1000);
+buildRows(); populateSettings(); render();
